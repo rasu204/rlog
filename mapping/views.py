@@ -39,18 +39,9 @@ def import_data(request):
 def fieldmatching(request):
     if request.method == 'POST':
         path_name = request.POST['path_name']
-        df = pd.read_csv(path_name)
-        t = df.isnull()
-        if t is True:
-            s = df.isnumeric()
-            if s is True:
-                df = df.fillna("0")
-            # else:
-            # df = df.fillna("None")
-
-        df = df.fillna("0")
+        df = pd.read_csv(path_name)        
         names = list(df.columns)
-
+        df = df.transform(lambda x: x.fillna('None') if x.dtype == 'object' else x.fillna(0))
         if request.POST.get('checkBox') == None:
             matched = {key: request.POST.get(key, False) for key in names}
             df.rename(columns=matched, inplace=True)
@@ -68,13 +59,6 @@ def fieldmatching(request):
     else:
         path_name = request.GET.get('df')
         df = pd.read_csv(path_name)
-        t = df.isnull()
-        if t is True:
-            s = df.isnumeric()
-            if s is True:
-                df = df.fillna("0")
-            else:
-                df = df.fillna("None")
         names = list(df.columns)
         fields = [field.name for field in Staging._meta.get_fields()]
         return render(request, 'fieldmatching.html',
