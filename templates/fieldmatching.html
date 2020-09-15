@@ -55,14 +55,14 @@
                       <div class="row">
                         <label class="col-sm-3 form-control-label">Material Inputs</label>
                         <div class="col-sm-9">
-                    {% for name in names %}
+                    {% for name in fields %}
                           <div class="form-group-material">
 
               <div style="margin-top:15px ">   {{name}}: </div>
         <div style="margin-left: 150px">  <select name="{{name}}">
 
             <option disabled selected value> -- select an option -- </option>
-            {% for field in fields %}
+            {% for field in names %}
               <option value={{field}}>{{field}}</option>
             {% endfor %}
         </select> </div>
