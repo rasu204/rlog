@@ -18,7 +18,7 @@ from pprint import pprint
 from django.forms.models import model_to_dict
 
 # Create your views here.
-CSV_STORAGE = os.path.join(os.getcwd(),  'static', 'csv')
+CSV_STORAGE = os.path.join(os.getcwd(), 'static', 'csv')
 
 
 @csrf_exempt
@@ -29,7 +29,7 @@ def import_data(request):
             df = pd.read_csv(new_students)
         else:
             df = pd.read_excel(new_students)  # make sure that there' no header
-        path_name = os.path.join( 'static', 'tempcsv', 'temp.csv')
+        path_name = os.path.join('static', 'tempcsv', 'temp.csv')
         df.to_csv(path_name, index=False)
         return redirect('/fieldmatching?df=' + path_name)
     else:
@@ -39,14 +39,24 @@ def import_data(request):
 def fieldmatching(request):
     if request.method == 'POST':
         path_name = request.POST['path_name']
-        df = pd.read_csv(path_name)        
+        df = pd.read_csv(path_name)
         names = list(df.columns)
+        fields = [field.name for field in Staging._meta.get_fields()]
         df = df.transform(lambda x: x.fillna('None') if x.dtype == 'object' else x.fillna(0))
         if request.POST.get('checkBox') == None:
-            matched = {key: request.POST.get(key, False) for key in names}
-            df.rename(columns=matched, inplace=True)
+            matched = {key: request.POST.get(key, False) for key in fields}
+            x = list(matched.keys())
+            #y = list(matched.values())
+            dict = {}
+            for key in list(matched.values()):
+                for value in x:
+                    dict[key] = value
+                    print(dict)
+                    x.remove(value)
+                    break
+            df.rename(columns=dict, inplace=True)
         # df.drop('id', axis=1, inplace=True)
-        df.set_index("id", drop=True, inplace=True)
+        #df.set_index("id", drop=True, inplace=True)
 
         dictionary = df.to_dict(orient="index")
         for index, object in dictionary.items():
