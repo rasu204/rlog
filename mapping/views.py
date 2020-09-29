@@ -19,8 +19,23 @@ from django.forms.models import model_to_dict
 
 # Create your views here.
 CSV_STORAGE = os.path.join(os.getcwd(), 'static', 'csv')
+dictionary = {}
+def choose(request):
+    if request.method == 'POST':
+        if request.POST.get('checkBox') == None:
+            #import_data(request)
+            return render(import_data(request))
+            #return render(request, 'import_data.html')
+        #import_data(request)
 
-
+    #else:
+        #if not bool(dictionary):
+            #print("Mapping done")
+        #else:
+            #print("No Previous matching columns found")
+        #return render(request, 'Choose.html')
+    else:
+        return render(request, 'Choose.html')
 @csrf_exempt
 def import_data(request):
     if request.method == 'POST':
