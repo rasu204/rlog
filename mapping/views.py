@@ -23,9 +23,7 @@ dictionary = {}
 def choose(request):
     if request.method == 'POST':
         if request.POST.get('checkBox') == None:
-            #import_data(request)
-            return render(import_data(request))
-            #return render(request, 'import_data.html')
+           return redirect('/import')
         #import_data(request)
 
     #else:
