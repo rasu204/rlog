@@ -24,16 +24,10 @@ def choose(request):
     if request.method == 'POST':
         if request.POST.get('checkBox') == None:
            return redirect('/import')
-        #import_data(request)
-
-    #else:
-        #if not bool(dictionary):
-            #print("Mapping done")
-        #else:
-            #print("No Previous matching columns found")
-        #return render(request, 'Choose.html')
+        return redirect('/import_p')
     else:
         return render(request, 'Choose.html')
+    
 @csrf_exempt
 def import_data(request):
     if request.method == 'POST':
@@ -72,12 +66,12 @@ def fieldmatching(request):
         #df.set_index("id", drop=True, inplace=True)
 
         dictionary = df.to_dict(orient="index")
-        for index, object in dictionary.items():
-            m = Staging()
-            for k, v in object.items():
-                setattr(m, k, v)
-            setattr(m, 'id', index)
-            m.save()
+        #for index, object in dictionary.items():
+            #m = Staging()
+            #for k, v in object.items():
+                #setattr(m, k, v)
+            #setattr(m, 'id', index)
+            #m.save()
         return render(request, 'import_data.html')
     else:
         path_name = request.GET.get('df')
@@ -98,3 +92,34 @@ def disp(request):
     }
 
     return render(request, 'mapping.html', context)
+
+def save_dict(dictionary):
+    for index, object in dictionary.items():
+        m = Staging()
+        for k, v in object.items():
+            setattr(m, k, v)
+        setattr(m, 'id', index)
+        m.save()
+
+
+def import_data_p(request):
+    if request.method == 'POST':
+        new_students = request.FILES['myfile']
+        if new_students.content_type == 'text/csv':
+            df = pd.read_csv(new_students)
+        else:
+            df = pd.read_excel(new_students)  # make sure that there' no header
+        path_name = os.path.join('pipeline', 'static', 'tempcsv', 'temp.csv')
+        df.to_csv(path_name, index=False)
+        df = pd.read_csv(path_name)
+        df = df.transform(lambda x: x.fillna('None') if x.dtype == 'object' else x.fillna(0))
+        #declare store dictionary
+        if not bool(dictionary):
+            save_dict(dictionary)
+        else:
+            print("No Previous Matching Columns Found")
+            return redirect('/choose')
+        #save_dict(dictionary)
+        return render(request, 'import_data.html')
+    else:
+        return render(request, 'import_data.html')
