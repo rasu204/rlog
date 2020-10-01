@@ -66,6 +66,7 @@ def fieldmatching(request):
         #df.set_index("id", drop=True, inplace=True)
 
         dictionary = df.to_dict(orient="index")
+        save_dict(dictionary)
         #for index, object in dictionary.items():
             #m = Staging()
             #for k, v in object.items():
