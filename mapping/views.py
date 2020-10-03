@@ -19,7 +19,6 @@ from django.forms.models import model_to_dict
 
 # Create your views here.
 CSV_STORAGE = os.path.join(os.getcwd(), 'static', 'csv')
-dictionary = {}
 
 
 def choose(request):
@@ -27,13 +26,7 @@ def choose(request):
         if request.POST.get('checkBox') == None:
             return redirect('/import')
 
-        # if not bool(dictionary):
-        # save_dict(dictionary)
-        # else:
-        # print("No Previous Matching Columns Found")
-        # return redirect('/choose')
         return redirect('/import_p')
-        # return render(request, 'Choose.html')
     else:
         return render(request, 'Choose.html')
 
@@ -71,19 +64,19 @@ def fieldmatching(request):
                     print(dict)
                     x.remove(value)
                     break
-            #print(dict)
+            # print(dict)
             df.rename(columns=dict, inplace=True)
         # df.drop('id', axis=1, inplace=True)
         # df.set_index("id", drop=True, inplace=True)
 
         dictionary = df.to_dict(orient="index")
-        #box = Mapping()
-        #box.MappingFor = 'Staging'
-        #box.UserID = '1'
-        #box.Mappings = dict
-        #a = {Mapping.objects.all()[0].Mappings}
-        #a = Mapping.objects.all()[0].Mappings
-        #print(a)
+        # box = Mapping()
+        # box.MappingFor = 'Staging'
+        # box.UserID = '1'
+        # box.Mappings = dict
+        # a = {Mapping.objects.all()[0].Mappings}
+        # a = Mapping.objects.all()[0].Mappings
+        # print(a)
         Mapping.objects.create(MappingFor='Staging', Mappings=dict)
         print(Mapping.objects.all()[0].Mappings)
         save_dict(dictionary)
@@ -137,15 +130,18 @@ def import_data_p(request):
         df = df.transform(lambda x: x.fillna('None') if x.dtype == 'object' else x.fillna(0))
         # declare store dictionary i.e we want dict
         print(Mapping.objects.all()[0].Mappings)
+        p = Mapping.objects.all()[0].Mappings
+        print(p)
         dict = {}
-        if not bool(dict):
-            df.rename(columns=dict, inplace=True)
+        print(dict)
+        if not bool(p):
+            print("No Previous Matching Columns Found")
+            return redirect('/choose')
+        else:
+            df.rename(columns=p, inplace=True)
             dictionary = df.to_dict(orient="index")
             save_dict(dictionary)
             print("columns found")
-        else:
-            print("No Previous Matching Columns Found")
-            return redirect('/choose')
         # save_dict(dictionary)
         return render(request, 'import_data.html')
     else:
