@@ -1,5 +1,5 @@
 from django.shortcuts import render
-# from .models import Mapping
+from .models import Mapping
 from records.models import Staging
 from django.shortcuts import render, redirect
 from records.forms import Staging_form
@@ -20,14 +20,24 @@ from django.forms.models import model_to_dict
 # Create your views here.
 CSV_STORAGE = os.path.join(os.getcwd(), 'static', 'csv')
 dictionary = {}
+
+
 def choose(request):
     if request.method == 'POST':
         if request.POST.get('checkBox') == None:
-           return redirect('/import')
+            return redirect('/import')
+
+        # if not bool(dictionary):
+        # save_dict(dictionary)
+        # else:
+        # print("No Previous Matching Columns Found")
+        # return redirect('/choose')
         return redirect('/import_p')
+        # return render(request, 'Choose.html')
     else:
         return render(request, 'Choose.html')
-    
+
+
 @csrf_exempt
 def import_data(request):
     if request.method == 'POST':
@@ -53,26 +63,36 @@ def fieldmatching(request):
         if request.POST.get('checkBox') == None:
             matched = {key: request.POST.get(key, False) for key in fields}
             x = list(matched.keys())
-            #y = list(matched.values())
+            y = list(matched.values())
             dict = {}
-            for key in list(matched.values()):
+            for key in y:
                 for value in x:
                     dict[key] = value
                     print(dict)
                     x.remove(value)
                     break
+            #print(dict)
             df.rename(columns=dict, inplace=True)
         # df.drop('id', axis=1, inplace=True)
-        #df.set_index("id", drop=True, inplace=True)
+        # df.set_index("id", drop=True, inplace=True)
 
         dictionary = df.to_dict(orient="index")
+        #box = Mapping()
+        #box.MappingFor = 'Staging'
+        #box.UserID = '1'
+        #box.Mappings = dict
+        #a = {Mapping.objects.all()[0].Mappings}
+        #a = Mapping.objects.all()[0].Mappings
+        #print(a)
+        Mapping.objects.create(MappingFor='Staging', Mappings=dict)
+        print(Mapping.objects.all()[0].Mappings)
         save_dict(dictionary)
-        #for index, object in dictionary.items():
-            #m = Staging()
-            #for k, v in object.items():
-                #setattr(m, k, v)
-            #setattr(m, 'id', index)
-            #m.save()
+        # for index, object in dictionary.items():
+        # m = Staging()
+        # for k, v in object.items():
+        # setattr(m, k, v)
+        # setattr(m, 'id', index)
+        # m.save()
         return render(request, 'import_data.html')
     else:
         path_name = request.GET.get('df')
@@ -94,6 +114,7 @@ def disp(request):
 
     return render(request, 'mapping.html', context)
 
+
 def save_dict(dictionary):
     for index, object in dictionary.items():
         m = Staging()
@@ -110,17 +131,22 @@ def import_data_p(request):
             df = pd.read_csv(new_students)
         else:
             df = pd.read_excel(new_students)  # make sure that there' no header
-        path_name = os.path.join('pipeline', 'static', 'tempcsv', 'temp.csv')
+        path_name = os.path.join('static', 'tempcsv', 'temp.csv')
         df.to_csv(path_name, index=False)
         df = pd.read_csv(path_name)
         df = df.transform(lambda x: x.fillna('None') if x.dtype == 'object' else x.fillna(0))
-        #declare store dictionary
-        if not bool(dictionary):
+        # declare store dictionary i.e we want dict
+        print(Mapping.objects.all()[0].Mappings)
+        dict = {}
+        if not bool(dict):
+            df.rename(columns=dict, inplace=True)
+            dictionary = df.to_dict(orient="index")
             save_dict(dictionary)
+            print("columns found")
         else:
             print("No Previous Matching Columns Found")
             return redirect('/choose')
-        #save_dict(dictionary)
+        # save_dict(dictionary)
         return render(request, 'import_data.html')
     else:
         return render(request, 'import_data.html')
