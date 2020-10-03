@@ -132,8 +132,6 @@ def import_data_p(request):
         print(Mapping.objects.all()[0].Mappings)
         p = Mapping.objects.all()[0].Mappings
         print(p)
-        dict = {}
-        print(dict)
         if not bool(p):
             print("No Previous Matching Columns Found")
             return redirect('/choose')
