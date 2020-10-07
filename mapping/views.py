@@ -64,28 +64,14 @@ def fieldmatching(request):
                     print(dict)
                     x.remove(value)
                     break
-            # print(dict)
             df.rename(columns=dict, inplace=True)
         # df.drop('id', axis=1, inplace=True)
         # df.set_index("id", drop=True, inplace=True)
 
         dictionary = df.to_dict(orient="index")
-        # box = Mapping()
-        # box.MappingFor = 'Staging'
-        # box.UserID = '1'
-        # box.Mappings = dict
-        # a = {Mapping.objects.all()[0].Mappings}
-        # a = Mapping.objects.all()[0].Mappings
-        # print(a)
         Mapping.objects.create(MappingFor='Staging', Mappings=dict)
         print(Mapping.objects.all()[0].Mappings)
         save_dict(dictionary)
-        # for index, object in dictionary.items():
-        # m = Staging()
-        # for k, v in object.items():
-        # setattr(m, k, v)
-        # setattr(m, 'id', index)
-        # m.save()
         return render(request, 'import_data.html')
     else:
         path_name = request.GET.get('df')
@@ -117,6 +103,16 @@ def save_dict(dictionary):
         m.save()
 
 
+def save_dict_call(dictionary, q):
+    for index, object in dictionary.items():
+        m = Staging()
+        for k, v in object.items():
+            setattr(m, k, v)
+        setattr(m, 'id', q)
+        q = q + 1;
+        m.save()
+
+
 def import_data_p(request):
     if request.method == 'POST':
         new_students = request.FILES['myfile']
@@ -129,16 +125,22 @@ def import_data_p(request):
         df = pd.read_csv(path_name)
         df = df.transform(lambda x: x.fillna('None') if x.dtype == 'object' else x.fillna(0))
         # declare store dictionary i.e we want dict
-        print(Mapping.objects.all()[0].Mappings)
         p = Mapping.objects.all()[0].Mappings
         print(p)
+        dict = {}
+        print(dict)
         if not bool(p):
             print("No Previous Matching Columns Found")
             return redirect('/choose')
         else:
             df.rename(columns=p, inplace=True)
+            engine = create_engine('postgresql://postgres:rasika@localhost:5432/rlog')
+            df.to_sql(name='Staging', con=engine, if_exists='append', index=False)
+            q = Staging.objects.count()
+            print(q)
+            q = q + 1
             dictionary = df.to_dict(orient="index")
-            save_dict(dictionary)
+            save_dict_call(dictionary, q)
             print("columns found")
         # save_dict(dictionary)
         return render(request, 'import_data.html')
