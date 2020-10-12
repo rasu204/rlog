@@ -19,9 +19,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-	path('',include('user.urls')),
+	path('', include('user.urls')),
     path('', include('mapping.urls')),
     path('admin/', admin.site.urls),
-	path('user/',include('user.urls')),
-    path('records/', include('records.urls'))
+    path('user/', include('user.urls')),
+    path('records/', include('records.urls')),
+    path('dash/', include('dashboard.urls')),
+    path('home/', include('landpage.urls')),
+    path('sys/', include('rlogsystem.urls')),
+    path('login/', include('login.urls')),
 ]
