@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>CandidateStatus Table</title>
+</head>
+<body>
+	<center>
+		<table border="1">
+			<tr>
+				<th>Company ID</th>
+				<th>Stage ID</th>
+				<th>Stage Name</th>
+				<th>Stage Type</th>
+
+			</tr>
+			{% for reult in data%}
+			<tr>
+				<td>{{result.companyid}}</td>
+				<td>{{result.stageid}}</td>
+				<td>{{result.stagename}}</td>
+				<td>{{result.stagetype}}</td>
+			</tr>
+            {% endfor %}
+
+		</table>
+
+
+
+	</center>
+
+</body>
+</html>
