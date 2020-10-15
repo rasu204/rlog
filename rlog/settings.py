@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'import_export',
     'rlogsystem',
     'login',
-    'landpage'
+    'landpage',
+    'dashboard'
 ]
 
 MIDDLEWARE = [
