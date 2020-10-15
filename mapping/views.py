@@ -82,16 +82,6 @@ def fieldmatching(request):
                       {'fields': fields, 'path_name': path_name, 'names': names})
 
 
-def disp(request):
-    data = pd.read_excel(r"H:\Candidate Report.xlsx")
-    df = []
-    db = []
-    context = {
-        'df': list(data.columns),
-        'db': list(field.name for field in Staging._meta.get_fields())
-    }
-
-    return render(request, 'mapping.html', context)
 
 
 def save_dict(dictionary):
